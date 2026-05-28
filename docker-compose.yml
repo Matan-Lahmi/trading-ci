@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  trading-tracker:
+    image: trading-tracker:latest
+    build: .
+    volumes:
+      - trading-data:/data
+    environment:
+      - DB_PATH=${DB_PATH:-/data/trading.db}
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.trading.rule=Host(`trading.matanlahmi.dev`)"
+      - "traefik.http.routers.trading.tls=true"
+      - "traefik.http.routers.trading.tls.certresolver=letsencrypt"
+      - "traefik.http.services.trading.loadbalancer.server.port=8000"
+      - "traefik.http.routers.trading.middlewares=trading-auth"
+      - "traefik.http.middlewares.trading-auth.basicauth.users=${BASIC_AUTH_USERS}"
+
+volumes:
+  trading-data:
+
+networks:
+  traefik-public:
+    external: true

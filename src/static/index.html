@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --border: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.3px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .btn-refresh {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    .btn-refresh:hover { background: #2d333b; }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ── Table ── */
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg-tertiary); }
+
+    td { padding: 11px 12px; vertical-align: middle; white-space: nowrap; }
+
+    .sym { font-weight: 700; font-size: 14px; color: var(--accent); }
+    .muted { color: var(--text-secondary); }
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.12s;
+    }
+    .btn-close-trade {
+      background: transparent;
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .btn-close-trade:hover { background: rgba(63,185,80,0.12); }
+
+    .btn-delete {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-secondary);
+      padding: 4px 7px;
+    }
+    .btn-delete:hover { color: var(--red); border-color: var(--red); background: rgba(248,81,73,0.08); }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+      font-weight: 600;
+      padding: 7px 16px;
+      font-size: 13px;
+    }
+    .btn-primary:hover { background: #79c0ff; }
+
+    .btn-confirm {
+      background: var(--green);
+      border-color: var(--green);
+      color: #0d1117;
+      font-weight: 600;
+    }
+    .btn-confirm:hover { background: #56d364; }
+
+    .btn-cancel {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-cancel:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+
+    /* ── Inline close form ── */
+    .close-form-row { display: none; }
+    .close-form-row.open { display: table-row; }
+
+    .close-form-row td {
+      background: var(--bg-tertiary);
+      padding: 10px 14px !important;
+    }
+
+    .inline-form {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .inline-field { display: flex; flex-direction: column; gap: 4px; }
+
+    .inline-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Inputs ── */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: border-color 0.15s;
+    }
+    input:focus { outline: none; border-color: var(--accent); }
+    input::placeholder { color: var(--text-secondary); }
+
+    /* ── Add trade form ── */
+    .add-form {
+      display: grid;
+      grid-template-columns: 120px 160px 120px 160px 1fr auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    @media (max-width: 1000px) {
+      .add-form { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .add-form { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .form-field input { width: 100%; }
+
+    /* ── Chart ── */
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    .chart-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 280px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 18px;
+      font-size: 13px;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error   { border-left: 3px solid var(--red); }
+
+    /* ── Empty state ── */
+    .empty-row td {
+      text-align: center;
+      padding: 32px !important;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">Trading Tracker</div>
+  <div class="header-right">
+    <span id="last-refresh"></span>
+    <button class="btn-refresh" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Open Positions</div>
+      <div class="stat-value" id="s-open">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Invested</div>
+      <div class="stat-value" id="s-invested">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unrealized P&amp;L</div>
+      <div class="stat-value" id="s-unrealized">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Realized P&amp;L</div>
+      <div class="stat-value" id="s-realized">—</div>
+    </div>
+  </div>
+
+  <!-- Open Trades -->
+  <div class="card">
+    <div class="card-title">
+      Open Trades
+      <span class="badge" id="open-badge">0</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Buy Date</th>
+            <th>Qty</th>
+            <th>Entry Price</th>
+            <th>Total Invested</th>
+            <th>Current Price</th>
+            <th>Daily Change</th>
+            <th>P&amp;L $</th>
+            <th>P&amp;L %</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="open-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Trade -->
+  <div class="card">
+    <div class="card-title">Add New Trade</div>
+    <form class="add-form" onsubmit="handleAddTrade(event)">
+      <div class="form-field">
+        <label for="f-sym">Symbol</label>
+        <input id="f-sym" type="text" placeholder="AAPL" maxlength="12" required>
+      </div>
+      <div class="form-field">
+        <label for="f-date">Buy Date</label>
+        <input id="f-date" type="date" required>
+      </div>
+      <div class="form-field">
+        <label for="f-qty">Quantity</label>
+        <input id="f-qty" type="number" placeholder="10" step="0.0001" min="0.0001" required>
+      </div>
+      <div class="form-field">
+        <label for="f-price">Entry Price ($)</label>
+        <input id="f-price" type="number" placeholder="150.00" step="0.01" min="0.01" required>
+      </div>
+      <div class="form-field">
+        <label for="f-notes">Notes (optional)</label>
+        <input id="f-notes" type="text" placeholder="Long-term hold…">
+      </div>
+      <div class="form-field">
+        <button type="submit" class="btn btn-primary">+ Add Trade</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Equity Curve -->
+  <div class="card">
+    <div class="card-title">Portfolio Equity Curve — Cumulative Realized P&amp;L</div>
+    <div id="chart-area">
+      <div class="chart-empty" id="chart-empty">Close trades to see your equity curve.</div>
+      <div class="chart-wrap" id="chart-wrap" style="display:none">
+        <canvas id="equity-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ─────────────────────────────────────────────────────────────────
+  const S = { trades: { open: [], closed: [] }, prices: {}, chart: null };
+
+  // ── Formatters ────────────────────────────────────────────────────────────
+  const fmt = (n, d = 2) =>
+    n == null || isNaN(n)
+      ? '—'
+      : Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const fmtUSD = n => {
+    if (n == null || isNaN(n)) return '—';
+    const abs = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (n < 0 ? '-$' : '$') + abs;
+  };
+
+  const cc = n => (n == null || isNaN(n) ? '' : n >= 0 ? 'green' : 'red');
+
+  const esc = s =>
+    String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg, type = 'success') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (el.className = 'toast'), 3200);
+  }
+
+  function setRefreshTime() {
+    document.getElementById('last-refresh').textContent =
+      'Updated ' + new Date().toLocaleTimeString();
+  }
+
+  // ── API helpers ───────────────────────────────────────────────────────────
+  async function apiFetchTrades() {
+    const r = await fetch('/api/trades');
+    if (!r.ok) throw new Error('Failed to load trades');
+    return r.json();
+  }
+
+  async function apiFetchPrice(symbol) {
+    try {
+      const r = await fetch(`/api/prices/${encodeURIComponent(symbol)}`);
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  }
+
+  async function apiAddTrade(body) {
+    const r = await fetch('/api/trades', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+
+  async function apiCloseTrade(id, close_price, close_date) {
+    const r = await fetch(`/api/trades/${id}/close`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ close_price, close_date }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+
+  async function apiDeleteTrade(id) {
+    const r = await fetch(`/api/trades/${id}`, { method: 'DELETE' });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+
+  // ── Render: open trades table ─────────────────────────────────────────────
+  function renderOpenTrades() {
+    const tbody = document.getElementById('open-tbody');
+    const trades = S.trades.open;
+    document.getElementById('open-badge').textContent = trades.length;
+
+    if (trades.length === 0) {
+      tbody.innerHTML =
+        '<tr class="empty-row"><td colspan="10">No open trades — add one below.</td></tr>';
+      return;
+    }
+
+    const SPIN = '<span class="spinner"></span>';
+
+    tbody.innerHTML = trades.map(t => {
+      const invested = t.quantity * t.entry_price;
+      const p = S.prices[t.symbol];
+
+      let curHtml = SPIN, chgHtml = SPIN, pnlDHtml = SPIN, pnlPHtml = SPIN;
+
+      if (p !== undefined) {
+        if (p === null || p.current_price == null) {
+          curHtml = '<span class="muted">N/A</span>';
+          chgHtml = '<span class="muted">N/A</span>';
+          pnlDHtml = '<span class="muted">N/A</span>';
+          pnlPHtml = '<span class="muted">N/A</span>';
+        } else {
+          const pnlD = (p.current_price - t.entry_price) * t.quantity;
+          const pnlP = ((p.current_price - t.entry_price) / t.entry_price) * 100;
+          const dc = p.daily_change_pct;
+          curHtml = `$${fmt(p.current_price)}`;
+          chgHtml = dc == null
+            ? '<span class="muted">N/A</span>'
+            : `<span class="${cc(dc)}">${dc >= 0 ? '+' : ''}${fmt(dc)}%</span>`;
+          pnlDHtml = `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
+          pnlPHtml = `<span class="${cc(pnlP)}">${pnlP >= 0 ? '+' : ''}${fmt(pnlP)}%</span>`;
+        }
+      }
+
+      return `
+        <tr id="tr-${t.id}">
+          <td class="sym">${esc(t.symbol)}</td>
+          <td class="muted">${esc(t.buy_date)}</td>
+          <td>${fmt(t.quantity, 4)}</td>
+          <td>$${fmt(t.entry_price)}</td>
+          <td>$${fmt(invested)}</td>
+          <td id="td-cur-${t.id}">${curHtml}</td>
+          <td id="td-chg-${t.id}">${chgHtml}</td>
+          <td id="td-pnld-${t.id}">${pnlDHtml}</td>
+          <td id="td-pnlp-${t.id}">${pnlPHtml}</td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="btn btn-close-trade" onclick="toggleCloseForm(${t.id})">Close</button>
+              <button class="btn btn-delete" title="Delete" onclick="handleDelete(${t.id})">✕</button>
+            </div>
+          </td>
+        </tr>
+        <tr class="close-form-row" id="cfr-${t.id}">
+          <td colspan="10">
+            <div class="inline-form">
+              <div class="inline-field">
+                <span class="inline-label">Close Price ($)</span>
+                <input type="number" id="cf-price-${t.id}" placeholder="0.00" step="0.01" min="0.01" style="width:120px">
+              </div>
+              <div class="inline-field">
+                <span class="inline-label">Close Date</span>
+                <input type="date" id="cf-date-${t.id}" value="${new Date().toISOString().slice(0,10)}" style="width:150px">
+              </div>
+              <button class="btn btn-confirm" onclick="handleClose(${t.id})">Confirm</button>
+              <button class="btn btn-cancel" onclick="toggleCloseForm(${t.id})">Cancel</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Update price cells without rebuilding the whole table
+  function applyPrice(trade, p) {
+    const curEl   = document.getElementById(`td-cur-${trade.id}`);
+    const chgEl   = document.getElementById(`td-chg-${trade.id}`);
+    const pnlDEl  = document.getElementById(`td-pnld-${trade.id}`);
+    const pnlPEl  = document.getElementById(`td-pnlp-${trade.id}`);
+    if (!curEl) return;
+
+    if (!p || p.current_price == null) {
+      curEl.innerHTML = '<span class="muted">N/A</span>';
+      chgEl.innerHTML = '<span class="muted">N/A</span>';
+      pnlDEl.innerHTML = '<span class="muted">N/A</span>';
+      pnlPEl.innerHTML = '<span class="muted">N/A</span>';
+      return;
+    }
+
+    const pnlD = (p.current_price - trade.entry_price) * trade.quantity;
+    const pnlP = ((p.current_price - trade.entry_price) / trade.entry_price) * 100;
+    const dc = p.daily_change_pct;
+
+    curEl.textContent = '$' + fmt(p.current_price);
+    chgEl.innerHTML = dc == null
+      ? '<span class="muted">N/A</span>'
+      : `<span class="${cc(dc)}">${dc >= 0 ? '+' : ''}${fmt(dc)}%</span>`;
+    pnlDEl.innerHTML = `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
+    pnlPEl.innerHTML = `<span class="${cc(pnlP)}">${pnlP >= 0 ? '+' : ''}${fmt(pnlP)}%</span>`;
+  }
+
+  // ── Render: stats bar ────────────────────────────────────────────────────
+  function renderStats() {
+    const open = S.trades.open;
+    const closed = S.trades.closed;
+
+    document.getElementById('s-open').textContent = open.length;
+
+    const invested = open.reduce((s, t) => s + t.quantity * t.entry_price, 0);
+    document.getElementById('s-invested').textContent = '$' + fmt(invested);
+
+    let unrealized = 0;
+    for (const t of open) {
+      const p = S.prices[t.symbol];
+      if (p && p.current_price != null) {
+        unrealized += (p.current_price - t.entry_price) * t.quantity;
+      }
+    }
+    const uEl = document.getElementById('s-unrealized');
+    uEl.textContent = fmtUSD(unrealized);
+    uEl.className = 'stat-value ' + cc(unrealized);
+
+    const realized = closed.reduce((s, t) => s + (t.close_price - t.entry_price) * t.quantity, 0);
+    const rEl = document.getElementById('s-realized');
+    rEl.textContent = fmtUSD(realized);
+    rEl.className = 'stat-value ' + cc(realized);
+  }
+
+  // ── Render: equity curve ─────────────────────────────────────────────────
+  function renderEquityCurve() {
+    const closed = S.trades.closed;
+    const emptyEl = document.getElementById('chart-empty');
+    const wrapEl  = document.getElementById('chart-wrap');
+
+    if (closed.length === 0) {
+      if (S.chart) { S.chart.destroy(); S.chart = null; }
+      emptyEl.style.display = 'flex';
+      wrapEl.style.display  = 'none';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    wrapEl.style.display  = 'block';
+
+    const sorted = [...closed].sort((a, b) => a.close_date.localeCompare(b.close_date));
+
+    let cum = 0;
+    const labels = [];
+    const data = [];
+    for (const t of sorted) {
+      cum += (t.close_price - t.entry_price) * t.quantity;
+      labels.push(t.close_date + (t.symbol ? ` (${t.symbol})` : ''));
+      data.push(parseFloat(cum.toFixed(2)));
+    }
+
+    const last = data[data.length - 1] ?? 0;
+    const lineColor = last >= 0 ? '#3fb950' : '#f85149';
+    const fillColor = last >= 0 ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.08)';
+
+    if (S.chart) { S.chart.destroy(); S.chart = null; }
+
+    S.chart = new Chart(document.getElementById('equity-canvas').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Cumulative Realized P&L',
+          data,
+          borderColor: lineColor,
+          backgroundColor: fillColor,
+          fill: true,
+          tension: 0.3,
+          pointRadius: data.length > 40 ? 0 : 4,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#161b22',
+            borderColor: '#30363d',
+            borderWidth: 1,
+            titleColor: '#8b949e',
+            bodyColor: '#e6edf3',
+            callbacks: { label: ctx => `P&L: ${fmtUSD(ctx.parsed.y)}` },
+          },
+        },
+        scales: {
+          x: {
+            grid: { color: '#21262d' },
+            ticks: { color: '#8b949e', maxTicksLimit: 10, maxRotation: 30 },
+          },
+          y: {
+            grid: { color: '#21262d' },
+            ticks: { color: '#8b949e', callback: v => fmtUSD(v) },
+          },
+        },
+      },
+    });
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
+  function toggleCloseForm(id) {
+    document.getElementById(`cfr-${id}`).classList.toggle('open');
+  }
+
+  async function handleClose(id) {
+    const priceVal = parseFloat(document.getElementById(`cf-price-${id}`).value);
+    const dateVal  = document.getElementById(`cf-date-${id}`).value;
+    if (!priceVal || priceVal <= 0) { toast('Enter a valid close price', 'error'); return; }
+    if (!dateVal) { toast('Enter a close date', 'error'); return; }
+    try {
+      await apiCloseTrade(id, priceVal, dateVal);
+      toast('Trade closed');
+      await loadAll();
+    } catch (e) {
+      toast('Error: ' + e.message, 'error');
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm('Delete this trade? This cannot be undone.')) return;
+    try {
+      await apiDeleteTrade(id);
+      toast('Trade deleted');
+      await loadAll();
+    } catch (e) {
+      toast('Error: ' + e.message, 'error');
+    }
+  }
+
+  async function handleAddTrade(e) {
+    e.preventDefault();
+    const symbol     = document.getElementById('f-sym').value.trim().toUpperCase();
+    const buy_date   = document.getElementById('f-date').value;
+    const quantity   = parseFloat(document.getElementById('f-qty').value);
+    const entry_price = parseFloat(document.getElementById('f-price').value);
+    const notes      = document.getElementById('f-notes').value.trim() || null;
+
+    try {
+      await apiAddTrade({ symbol, buy_date, quantity, entry_price, notes });
+      toast(`Added ${symbol}`);
+      e.target.reset();
+      await loadAll();
+    } catch (err) {
+      toast('Error: ' + err.message, 'error');
+    }
+  }
+
+  // ── Price loading ─────────────────────────────────────────────────────────
+  async function loadPrices() {
+    const symbols = [...new Set(S.trades.open.map(t => t.symbol))];
+    if (!symbols.length) return;
+
+    await Promise.all(
+      symbols.map(async sym => {
+        const p = await apiFetchPrice(sym);
+        S.prices[sym] = p;
+        for (const t of S.trades.open) {
+          if (t.symbol === sym) applyPrice(t, p);
+        }
+        renderStats();
+      })
+    );
+  }
+
+  // ── Full load ─────────────────────────────────────────────────────────────
+  async function loadAll() {
+    try {
+      S.trades = await apiFetchTrades();
+      S.prices = {};
+      renderOpenTrades();
+      renderEquityCurve();
+      renderStats();
+      setRefreshTime();
+      await loadPrices();
+      setRefreshTime();
+    } catch (err) {
+      toast('Failed to load: ' + err.message, 'error');
+    }
+  }
+
+  async function refreshAll() {
+    S.prices = {};
+    await loadAll();
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  // Set today as default buy date
+  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
+
+  loadAll();
+
+  // Auto-refresh prices every 60 seconds
+  setInterval(async () => {
+    if (S.trades.open.length > 0) {
+      await loadPrices();
+      setRefreshTime();
+    }
+  }, 60_000);
+</script>
+</body>
+</html>
