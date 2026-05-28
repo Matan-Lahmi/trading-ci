@@ -7,15 +7,15 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg-primary: #0d1117;
+      --bg-primary:   #0d1117;
       --bg-secondary: #161b22;
-      --bg-tertiary: #21262d;
-      --border: #30363d;
+      --bg-tertiary:  #21262d;
+      --border:       #30363d;
       --text-primary: #e6edf3;
-      --text-secondary: #8b949e;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --red: #f85149;
+      --text-muted:   #8b949e;
+      --accent:       #58a6ff;
+      --green:        #3fb950;
+      --red:          #f85149;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +28,7 @@
       min-height: 100vh;
     }
 
-    /* ── Header ── */
+    /* ── Header ─────────────────────────────────────────────────── */
     header {
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border);
@@ -40,22 +40,19 @@
       top: 0;
       z-index: 100;
     }
-
     .header-title {
       font-size: 18px;
       font-weight: 700;
       color: var(--accent);
       letter-spacing: -0.3px;
     }
-
     .header-right {
       display: flex;
       align-items: center;
       gap: 14px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       font-size: 12px;
     }
-
     .btn-refresh {
       background: var(--bg-tertiary);
       border: 1px solid var(--border);
@@ -68,7 +65,7 @@
     }
     .btn-refresh:hover { background: #2d333b; }
 
-    /* ── Layout ── */
+    /* ── Layout ─────────────────────────────────────────────────── */
     main {
       max-width: 1440px;
       margin: 0 auto;
@@ -77,79 +74,65 @@
       flex-direction: column;
       gap: 20px;
     }
-
     .card {
       background: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 18px 20px;
     }
-
     .card-title {
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
       margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
     .badge {
       background: var(--bg-tertiary);
       border: 1px solid var(--border);
-      color: var(--text-secondary);
+      color: var(--text-muted);
       padding: 1px 7px;
       border-radius: 10px;
       font-size: 11px;
       font-weight: 500;
     }
 
-    /* ── Stats bar ── */
+    /* ── Stats bar ──────────────────────────────────────────────── */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
     }
-
     @media (max-width: 900px) {
       .stats-bar { grid-template-columns: repeat(2, 1fr); }
     }
-
     .stat-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 14px 16px;
     }
-
     .stat-label {
       font-size: 11px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.6px;
       margin-bottom: 6px;
     }
-
     .stat-value {
       font-size: 22px;
       font-weight: 700;
       color: var(--text-primary);
     }
 
-    /* ── Table ── */
+    /* ── Table ──────────────────────────────────────────────────── */
     .table-wrapper { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
     thead th {
       text-align: left;
       padding: 8px 12px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       font-weight: 500;
       font-size: 11px;
       text-transform: uppercase;
@@ -157,19 +140,31 @@
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
-
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: var(--bg-tertiary); }
-
     td { padding: 11px 12px; vertical-align: middle; white-space: nowrap; }
 
-    .sym { font-weight: 700; font-size: 14px; color: var(--accent); }
-    .muted { color: var(--text-secondary); }
+    .sym   { font-weight: 700; font-size: 14px; color: var(--accent); }
+    .muted { color: var(--text-muted); }
     .green { color: var(--green); }
-    .red { color: var(--red); }
+    .red   { color: var(--red); }
 
-    /* ── Spinner ── */
+    /* ── Row colour variants ────────────────────────────────────── */
+    tbody tr.row-profit { background: rgba(63,185,80,0.05); }
+    tbody tr.row-loss   { background: rgba(248,81,73,0.05); }
+    tbody tr.row-profit:hover { background: rgba(63,185,80,0.10); }
+    tbody tr.row-loss:hover   { background: rgba(248,81,73,0.10); }
+
+    tbody tr.closed-profit { background: #0d2818; }
+    tbody tr.closed-loss   { background: #2d0f0f; }
+    tbody tr.closed-profit:hover { background: #112f1d; }
+    tbody tr.closed-loss:hover   { background: #331313; }
+
+    /* ── Spinner ────────────────────────────────────────────────── */
     .spinner {
       display: inline-block;
       width: 13px;
@@ -182,7 +177,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Buttons ── */
+    /* ── Buttons ────────────────────────────────────────────────── */
     .btn {
       padding: 4px 10px;
       border-radius: 5px;
@@ -202,11 +197,14 @@
     .btn-delete {
       background: transparent;
       border-color: transparent;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       padding: 4px 7px;
     }
-    .btn-delete:hover { color: var(--red); border-color: var(--red); background: rgba(248,81,73,0.08); }
-
+    .btn-delete:hover {
+      color: var(--red);
+      border-color: var(--red);
+      background: rgba(248,81,73,0.08);
+    }
     .btn-primary {
       background: var(--accent);
       border-color: var(--accent);
@@ -228,36 +226,46 @@
     .btn-cancel {
       background: transparent;
       border-color: var(--border);
-      color: var(--text-secondary);
+      color: var(--text-muted);
     }
     .btn-cancel:hover { color: var(--text-primary); background: var(--bg-tertiary); }
 
-    /* ── Inline close form ── */
+    .btn-show-all {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 2px 9px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.12s;
+    }
+    .btn-show-all:hover { color: var(--text-primary); border-color: var(--accent); }
+
+    /* ── Inline close form ──────────────────────────────────────── */
     .close-form-row { display: none; }
     .close-form-row.open { display: table-row; }
-
     .close-form-row td {
       background: var(--bg-tertiary);
       padding: 10px 14px !important;
     }
-
     .inline-form {
       display: flex;
       align-items: flex-end;
       gap: 12px;
       flex-wrap: wrap;
     }
-
     .inline-field { display: flex; flex-direction: column; gap: 4px; }
-
     .inline-label {
       font-size: 11px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    /* ── Inputs ── */
+    /* ── Inputs ─────────────────────────────────────────────────── */
     input[type="text"],
     input[type="number"],
     input[type="date"] {
@@ -270,45 +278,62 @@
       transition: border-color 0.15s;
     }
     input:focus { outline: none; border-color: var(--accent); }
-    input::placeholder { color: var(--text-secondary); }
+    input::placeholder { color: var(--text-muted); }
 
-    /* ── Add trade form ── */
+    /* ── Add-trade form ─────────────────────────────────────────── */
     .add-form {
       display: grid;
       grid-template-columns: 120px 160px 120px 160px 1fr auto;
       gap: 14px;
       align-items: end;
     }
-
     @media (max-width: 1000px) {
       .add-form { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 640px) {
       .add-form { grid-template-columns: 1fr 1fr; }
     }
-
     .form-field { display: flex; flex-direction: column; gap: 5px; }
-    .form-field label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .form-field label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
     .form-field input { width: 100%; }
 
-    /* ── Chart ── */
-    .chart-wrap {
-      position: relative;
-      height: 280px;
-    }
-
+    /* ── Chart ──────────────────────────────────────────────────── */
+    .chart-wrap { position: relative; height: 280px; }
     .chart-empty {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 280px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       font-size: 13px;
       border: 1px dashed var(--border);
       border-radius: 6px;
     }
 
-    /* ── Toast ── */
+    /* ── Loading placeholder ────────────────────────────────────── */
+    .loading-placeholder {
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    /* ── Summary row (below closed trades) ──────────────────────── */
+    .summary-row {
+      border-top: 1px solid var(--border);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── Toast ──────────────────────────────────────────────────── */
     .toast {
       position: fixed;
       bottom: 22px;
@@ -328,11 +353,45 @@
     .toast.success { border-left: 3px solid var(--green); }
     .toast.error   { border-left: 3px solid var(--red); }
 
-    /* ── Empty state ── */
+    /* ── Tooltip popup ──────────────────────────────────────────── */
+    .tt-popup {
+      position: fixed;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 7px;
+      padding: 10px 14px;
+      font-size: 12px;
+      z-index: 9998;
+      pointer-events: none;
+      display: none;
+      color: #e6edf3;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+      min-width: 260px;
+    }
+    .tt-popup.show { display: block; }
+    .tt-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #8b949e;
+      margin-bottom: 7px;
+    }
+    .tt-row {
+      display: grid;
+      grid-template-columns: 60px 70px 90px 90px;
+      gap: 4px;
+      padding: 3px 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 11px;
+    }
+    .tt-row:last-child { border-bottom: none; }
+    .tt-sym { font-weight: 700; color: #58a6ff; }
+
+    /* ── Empty state ────────────────────────────────────────────── */
     .empty-row td {
       text-align: center;
       padding: 32px !important;
-      color: var(--text-secondary);
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -348,7 +407,7 @@
 
 <main>
 
-  <!-- Stats -->
+  <!-- Stats bar -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="stat-label">Open Positions</div>
@@ -395,6 +454,33 @@
     </div>
   </div>
 
+  <!-- Portfolio Daily History -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:8px">
+        Portfolio Daily History
+        <span class="badge" id="history-badge">—</span>
+      </span>
+      <button class="btn-show-all" id="btn-show-all"
+              onclick="toggleHistoryAll()">Show All</button>
+    </div>
+    <div id="history-loading" class="loading-placeholder">
+      <span class="spinner"></span>&nbsp; Fetching price history…
+    </div>
+    <div class="table-wrapper" id="history-wrap" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Daily P&amp;L</th>
+            <th>Total P&amp;L from Entry</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Add Trade -->
   <div class="card">
     <div class="card-title">Add New Trade</div>
@@ -427,36 +513,80 @@
 
   <!-- Equity Curve -->
   <div class="card">
-    <div class="card-title">Portfolio Equity Curve — Cumulative Realized P&amp;L</div>
+    <div class="card-title">
+      Portfolio Equity Curve — Cumulative Realized P&amp;L
+    </div>
     <div id="chart-area">
-      <div class="chart-empty" id="chart-empty">Close trades to see your equity curve.</div>
+      <div class="chart-empty" id="chart-empty">
+        Close trades to see your equity curve.
+      </div>
       <div class="chart-wrap" id="chart-wrap" style="display:none">
         <canvas id="equity-canvas"></canvas>
       </div>
     </div>
   </div>
 
+  <!-- Closed Trades History -->
+  <div class="card">
+    <div class="card-title">Closed Trades History</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Buy Date</th>
+            <th>Close Date</th>
+            <th>Qty</th>
+            <th>Entry Price</th>
+            <th>Close Price</th>
+            <th>P&amp;L $</th>
+            <th>P&amp;L %</th>
+          </tr>
+        </thead>
+        <tbody id="closed-tbody"></tbody>
+      </table>
+    </div>
+    <div id="closed-summary"></div>
+  </div>
+
 </main>
 
+<!-- Tooltip popup (singleton) -->
+<div class="tt-popup" id="tt-popup"></div>
+
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── State ─────────────────────────────────────────────────────────────────
-  const S = { trades: { open: [], closed: [] }, prices: {}, chart: null };
+  // ── State ──────────────────────────────────────────────────────────────────
+  const S = {
+    trades: { open: [], closed: [] },
+    prices: {},
+    chart: null,
+    dailyHistory: [],
+    showAllHistory: false,
+  };
 
-  // ── Formatters ────────────────────────────────────────────────────────────
+  // ── Formatters ─────────────────────────────────────────────────────────────
   const fmt = (n, d = 2) =>
     n == null || isNaN(n)
       ? '—'
-      : Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+      : Number(n).toLocaleString('en-US', {
+          minimumFractionDigits: d,
+          maximumFractionDigits: d,
+        });
 
   const fmtUSD = n => {
     if (n == null || isNaN(n)) return '—';
-    const abs = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const abs = Math.abs(n).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
     return (n < 0 ? '-$' : '$') + abs;
   };
 
-  const cc = n => (n == null || isNaN(n) ? '' : n >= 0 ? 'green' : 'red');
+  const sign = n => (n != null && n >= 0 ? '+' : '');
+  const cc   = n => (n == null || isNaN(n) ? '' : n >= 0 ? 'green' : 'red');
 
   const esc = s =>
     String(s)
@@ -465,14 +595,14 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  let toastTimer;
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  let _toastTimer;
   function toast(msg, type = 'success') {
     const el = document.getElementById('toast');
     el.textContent = msg;
     el.className = `toast ${type} show`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => (el.className = 'toast'), 3200);
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => (el.className = 'toast'), 3200);
   }
 
   function setRefreshTime() {
@@ -480,7 +610,7 @@
       'Updated ' + new Date().toLocaleTimeString();
   }
 
-  // ── API helpers ───────────────────────────────────────────────────────────
+  // ── API ────────────────────────────────────────────────────────────────────
   async function apiFetchTrades() {
     const r = await fetch('/api/trades');
     if (!r.ok) throw new Error('Failed to load trades');
@@ -489,9 +619,18 @@
 
   async function apiFetchPrice(symbol) {
     try {
-      const r = await fetch(`/api/prices/${encodeURIComponent(symbol)}`);
+      const r = await fetch(
+        `/api/prices/${encodeURIComponent(symbol)}`
+      );
       return r.ok ? r.json() : null;
     } catch { return null; }
+  }
+
+  async function apiFetchDailyHistory() {
+    try {
+      const r = await fetch('/api/portfolio/daily-history');
+      return r.ok ? r.json() : [];
+    } catch { return []; }
   }
 
   async function apiAddTrade(body) {
@@ -520,15 +659,60 @@
     return r.json();
   }
 
-  // ── Render: open trades table ─────────────────────────────────────────────
+  // ── Render: stats bar ──────────────────────────────────────────────────────
+  // Feature 1: correctly aggregates ALL open/closed positions;
+  // shows "…" for unrealized while any price is still loading.
+  function renderStats() {
+    const open   = S.trades.open;
+    const closed = S.trades.closed;
+
+    document.getElementById('s-open').textContent = open.length;
+
+    // Total Invested = sum(qty × entry_price) for ALL open trades
+    const invested = open.reduce(
+      (s, t) => s + t.quantity * t.entry_price, 0
+    );
+    document.getElementById('s-invested').textContent =
+      '$' + fmt(invested);
+
+    // Unrealized P&L — show "…" until every symbol has been fetched
+    let unrealized = 0;
+    let allFetched = true;
+    for (const t of open) {
+      const p = S.prices[t.symbol];
+      if (p === undefined) { allFetched = false; continue; }
+      if (p && p.current_price != null) {
+        unrealized += (p.current_price - t.entry_price) * t.quantity;
+      }
+    }
+    const uEl = document.getElementById('s-unrealized');
+    if (open.length > 0 && !allFetched) {
+      uEl.textContent  = '…';
+      uEl.className    = 'stat-value muted';
+    } else {
+      uEl.textContent  = fmtUSD(unrealized);
+      uEl.className    = 'stat-value ' + cc(unrealized);
+    }
+
+    // Realized P&L = sum((close - entry) × qty) for ALL closed trades
+    const realized = closed.reduce(
+      (s, t) => s + (t.close_price - t.entry_price) * t.quantity, 0
+    );
+    const rEl = document.getElementById('s-realized');
+    rEl.textContent = fmtUSD(realized);
+    rEl.className   = 'stat-value ' + cc(realized);
+  }
+
+  // ── Render: open trades table ──────────────────────────────────────────────
   function renderOpenTrades() {
-    const tbody = document.getElementById('open-tbody');
+    const tbody  = document.getElementById('open-tbody');
     const trades = S.trades.open;
     document.getElementById('open-badge').textContent = trades.length;
 
     if (trades.length === 0) {
       tbody.innerHTML =
-        '<tr class="empty-row"><td colspan="10">No open trades — add one below.</td></tr>';
+        '<tr class="empty-row"><td colspan="10">' +
+        'No open trades — add one below.</td></tr>';
       return;
     }
 
@@ -538,24 +722,28 @@
       const invested = t.quantity * t.entry_price;
       const p = S.prices[t.symbol];
 
-      let curHtml = SPIN, chgHtml = SPIN, pnlDHtml = SPIN, pnlPHtml = SPIN;
+      let curHtml = SPIN, chgHtml = SPIN,
+          pnlDHtml = SPIN, pnlPHtml = SPIN;
 
       if (p !== undefined) {
-        if (p === null || p.current_price == null) {
-          curHtml = '<span class="muted">N/A</span>';
-          chgHtml = '<span class="muted">N/A</span>';
+        if (!p || p.current_price == null) {
+          curHtml  = '<span class="muted">N/A</span>';
+          chgHtml  = '<span class="muted">N/A</span>';
           pnlDHtml = '<span class="muted">N/A</span>';
           pnlPHtml = '<span class="muted">N/A</span>';
         } else {
           const pnlD = (p.current_price - t.entry_price) * t.quantity;
-          const pnlP = ((p.current_price - t.entry_price) / t.entry_price) * 100;
+          const pnlP =
+            ((p.current_price - t.entry_price) / t.entry_price) * 100;
           const dc = p.daily_change_pct;
-          curHtml = `$${fmt(p.current_price)}`;
-          chgHtml = dc == null
+          curHtml  = `$${fmt(p.current_price)}`;
+          chgHtml  = dc == null
             ? '<span class="muted">N/A</span>'
-            : `<span class="${cc(dc)}">${dc >= 0 ? '+' : ''}${fmt(dc)}%</span>`;
-          pnlDHtml = `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
-          pnlPHtml = `<span class="${cc(pnlP)}">${pnlP >= 0 ? '+' : ''}${fmt(pnlP)}%</span>`;
+            : `<span class="${cc(dc)}">${sign(dc)}${fmt(dc)}%</span>`;
+          pnlDHtml =
+            `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
+          pnlPHtml =
+            `<span class="${cc(pnlP)}">${sign(pnlP)}${fmt(pnlP)}%</span>`;
         }
       }
 
@@ -572,8 +760,10 @@
           <td id="td-pnlp-${t.id}">${pnlPHtml}</td>
           <td>
             <div style="display:flex;gap:6px;align-items:center">
-              <button class="btn btn-close-trade" onclick="toggleCloseForm(${t.id})">Close</button>
-              <button class="btn btn-delete" title="Delete" onclick="handleDelete(${t.id})">✕</button>
+              <button class="btn btn-close-trade"
+                      onclick="toggleCloseForm(${t.id})">Close</button>
+              <button class="btn btn-delete" title="Delete"
+                      onclick="handleDelete(${t.id})">✕</button>
             </div>
           </td>
         </tr>
@@ -582,14 +772,20 @@
             <div class="inline-form">
               <div class="inline-field">
                 <span class="inline-label">Close Price ($)</span>
-                <input type="number" id="cf-price-${t.id}" placeholder="0.00" step="0.01" min="0.01" style="width:120px">
+                <input type="number" id="cf-price-${t.id}"
+                       placeholder="0.00" step="0.01" min="0.01"
+                       style="width:120px">
               </div>
               <div class="inline-field">
                 <span class="inline-label">Close Date</span>
-                <input type="date" id="cf-date-${t.id}" value="${new Date().toISOString().slice(0,10)}" style="width:150px">
+                <input type="date" id="cf-date-${t.id}"
+                       value="${new Date().toISOString().slice(0,10)}"
+                       style="width:150px">
               </div>
-              <button class="btn btn-confirm" onclick="handleClose(${t.id})">Confirm</button>
-              <button class="btn btn-cancel" onclick="toggleCloseForm(${t.id})">Cancel</button>
+              <button class="btn btn-confirm"
+                      onclick="handleClose(${t.id})">Confirm</button>
+              <button class="btn btn-cancel"
+                      onclick="toggleCloseForm(${t.id})">Cancel</button>
             </div>
           </td>
         </tr>
@@ -597,64 +793,41 @@
     }).join('');
   }
 
-  // Update price cells without rebuilding the whole table
+  // Update price cells in-place (no full table rebuild)
   function applyPrice(trade, p) {
-    const curEl   = document.getElementById(`td-cur-${trade.id}`);
-    const chgEl   = document.getElementById(`td-chg-${trade.id}`);
-    const pnlDEl  = document.getElementById(`td-pnld-${trade.id}`);
-    const pnlPEl  = document.getElementById(`td-pnlp-${trade.id}`);
+    const curEl  = document.getElementById(`td-cur-${trade.id}`);
+    const chgEl  = document.getElementById(`td-chg-${trade.id}`);
+    const pnlDEl = document.getElementById(`td-pnld-${trade.id}`);
+    const pnlPEl = document.getElementById(`td-pnlp-${trade.id}`);
     if (!curEl) return;
 
     if (!p || p.current_price == null) {
-      curEl.innerHTML = '<span class="muted">N/A</span>';
-      chgEl.innerHTML = '<span class="muted">N/A</span>';
+      curEl.innerHTML  = '<span class="muted">N/A</span>';
+      chgEl.innerHTML  = '<span class="muted">N/A</span>';
       pnlDEl.innerHTML = '<span class="muted">N/A</span>';
       pnlPEl.innerHTML = '<span class="muted">N/A</span>';
       return;
     }
 
-    const pnlD = (p.current_price - trade.entry_price) * trade.quantity;
-    const pnlP = ((p.current_price - trade.entry_price) / trade.entry_price) * 100;
+    const pnlD =
+      (p.current_price - trade.entry_price) * trade.quantity;
+    const pnlP =
+      ((p.current_price - trade.entry_price) / trade.entry_price) * 100;
     const dc = p.daily_change_pct;
 
     curEl.textContent = '$' + fmt(p.current_price);
-    chgEl.innerHTML = dc == null
+    chgEl.innerHTML   = dc == null
       ? '<span class="muted">N/A</span>'
-      : `<span class="${cc(dc)}">${dc >= 0 ? '+' : ''}${fmt(dc)}%</span>`;
-    pnlDEl.innerHTML = `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
-    pnlPEl.innerHTML = `<span class="${cc(pnlP)}">${pnlP >= 0 ? '+' : ''}${fmt(pnlP)}%</span>`;
+      : `<span class="${cc(dc)}">${sign(dc)}${fmt(dc)}%</span>`;
+    pnlDEl.innerHTML  =
+      `<span class="${cc(pnlD)}">${fmtUSD(pnlD)}</span>`;
+    pnlPEl.innerHTML  =
+      `<span class="${cc(pnlP)}">${sign(pnlP)}${fmt(pnlP)}%</span>`;
   }
 
-  // ── Render: stats bar ────────────────────────────────────────────────────
-  function renderStats() {
-    const open = S.trades.open;
-    const closed = S.trades.closed;
-
-    document.getElementById('s-open').textContent = open.length;
-
-    const invested = open.reduce((s, t) => s + t.quantity * t.entry_price, 0);
-    document.getElementById('s-invested').textContent = '$' + fmt(invested);
-
-    let unrealized = 0;
-    for (const t of open) {
-      const p = S.prices[t.symbol];
-      if (p && p.current_price != null) {
-        unrealized += (p.current_price - t.entry_price) * t.quantity;
-      }
-    }
-    const uEl = document.getElementById('s-unrealized');
-    uEl.textContent = fmtUSD(unrealized);
-    uEl.className = 'stat-value ' + cc(unrealized);
-
-    const realized = closed.reduce((s, t) => s + (t.close_price - t.entry_price) * t.quantity, 0);
-    const rEl = document.getElementById('s-realized');
-    rEl.textContent = fmtUSD(realized);
-    rEl.className = 'stat-value ' + cc(realized);
-  }
-
-  // ── Render: equity curve ─────────────────────────────────────────────────
+  // ── Render: equity curve ───────────────────────────────────────────────────
   function renderEquityCurve() {
-    const closed = S.trades.closed;
+    const closed  = S.trades.closed;
     const emptyEl = document.getElementById('chart-empty');
     const wrapEl  = document.getElementById('chart-wrap');
 
@@ -668,77 +841,261 @@
     emptyEl.style.display = 'none';
     wrapEl.style.display  = 'block';
 
-    const sorted = [...closed].sort((a, b) => a.close_date.localeCompare(b.close_date));
-
+    const sorted = [...closed].sort(
+      (a, b) => a.close_date.localeCompare(b.close_date)
+    );
     let cum = 0;
-    const labels = [];
-    const data = [];
+    const labels = [], data = [];
     for (const t of sorted) {
       cum += (t.close_price - t.entry_price) * t.quantity;
-      labels.push(t.close_date + (t.symbol ? ` (${t.symbol})` : ''));
+      labels.push(
+        t.close_date + (t.symbol ? ` (${t.symbol})` : '')
+      );
       data.push(parseFloat(cum.toFixed(2)));
     }
 
-    const last = data[data.length - 1] ?? 0;
+    const last      = data[data.length - 1] ?? 0;
     const lineColor = last >= 0 ? '#3fb950' : '#f85149';
-    const fillColor = last >= 0 ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.08)';
+    const fillColor = last >= 0
+      ? 'rgba(63,185,80,0.08)'
+      : 'rgba(248,81,73,0.08)';
 
     if (S.chart) { S.chart.destroy(); S.chart = null; }
 
-    S.chart = new Chart(document.getElementById('equity-canvas').getContext('2d'), {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Cumulative Realized P&L',
-          data,
-          borderColor: lineColor,
-          backgroundColor: fillColor,
-          fill: true,
-          tension: 0.3,
-          pointRadius: data.length > 40 ? 0 : 4,
-          pointHoverRadius: 5,
-          borderWidth: 2,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#161b22',
-            borderColor: '#30363d',
-            borderWidth: 1,
-            titleColor: '#8b949e',
-            bodyColor: '#e6edf3',
-            callbacks: { label: ctx => `P&L: ${fmtUSD(ctx.parsed.y)}` },
+    S.chart = new Chart(
+      document.getElementById('equity-canvas').getContext('2d'),
+      {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Cumulative Realized P&L',
+            data,
+            borderColor: lineColor,
+            backgroundColor: fillColor,
+            fill: true,
+            tension: 0.3,
+            pointRadius: data.length > 40 ? 0 : 4,
+            pointHoverRadius: 5,
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#161b22',
+              borderColor: '#30363d',
+              borderWidth: 1,
+              titleColor: '#8b949e',
+              bodyColor: '#e6edf3',
+              callbacks: {
+                label: ctx => `P&L: ${fmtUSD(ctx.parsed.y)}`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { color: '#21262d' },
+              ticks: {
+                color: '#8b949e',
+                maxTicksLimit: 10,
+                maxRotation: 30,
+              },
+            },
+            y: {
+              grid: { color: '#21262d' },
+              ticks: {
+                color: '#8b949e',
+                callback: v => fmtUSD(v),
+              },
+            },
           },
         },
-        scales: {
-          x: {
-            grid: { color: '#21262d' },
-            ticks: { color: '#8b949e', maxTicksLimit: 10, maxRotation: 30 },
-          },
-          y: {
-            grid: { color: '#21262d' },
-            ticks: { color: '#8b949e', callback: v => fmtUSD(v) },
-          },
-        },
-      },
-    });
+      }
+    );
   }
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+  // ── Feature 2: Daily P&L History ──────────────────────────────────────────
+  function renderDailyHistory() {
+    const loadEl  = document.getElementById('history-loading');
+    const wrapEl  = document.getElementById('history-wrap');
+    const tbody   = document.getElementById('history-tbody');
+    const badgeEl = document.getElementById('history-badge');
+    const btnEl   = document.getElementById('btn-show-all');
+
+    if (!S.dailyHistory.length) {
+      loadEl.innerHTML    = 'No history available yet.';
+      loadEl.style.display = 'block';
+      wrapEl.style.display = 'none';
+      badgeEl.textContent  = '0';
+      return;
+    }
+
+    loadEl.style.display = 'none';
+    wrapEl.style.display = 'block';
+
+    // Newest first
+    const sorted  = [...S.dailyHistory].sort(
+      (a, b) => b.date.localeCompare(a.date)
+    );
+    const total   = sorted.length;
+    const showing = S.showAllHistory ? sorted : sorted.slice(0, 30);
+
+    badgeEl.textContent =
+      S.showAllHistory ? total : `${showing.length} / ${total}`;
+    btnEl.textContent   =
+      S.showAllHistory ? 'Show Less' : 'Show All';
+
+    tbody.innerHTML = showing.map(row => {
+      const rowCls = row.total_pnl_from_entry >= 0
+        ? 'row-profit' : 'row-loss';
+      const encoded =
+        encodeURIComponent(JSON.stringify(row.breakdown));
+      return `
+        <tr class="${rowCls}"
+            data-breakdown="${esc(encoded)}"
+            onmouseenter="showTT(event,this)"
+            onmousemove="moveTT(event)"
+            onmouseleave="hideTT()">
+          <td class="muted">${esc(row.date)}</td>
+          <td>
+            <span class="${cc(row.daily_pnl)}">
+              ${sign(row.daily_pnl)}${fmtUSD(row.daily_pnl)}
+            </span>
+          </td>
+          <td>
+            <span class="${cc(row.total_pnl_from_entry)}">
+              ${sign(row.total_pnl_from_entry)}
+              ${fmtUSD(row.total_pnl_from_entry)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function toggleHistoryAll() {
+    S.showAllHistory = !S.showAllHistory;
+    renderDailyHistory();
+  }
+
+  // ── Feature 3: Closed Trades History ──────────────────────────────────────
+  function renderClosedTrades() {
+    const tbody     = document.getElementById('closed-tbody');
+    const summaryEl = document.getElementById('closed-summary');
+    const closed    = [...S.trades.closed].sort(
+      (a, b) => b.close_date.localeCompare(a.close_date)
+    );
+
+    if (!closed.length) {
+      tbody.innerHTML =
+        '<tr class="empty-row"><td colspan="8">' +
+        'No closed trades yet.</td></tr>';
+      summaryEl.innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = closed.map(t => {
+      const pnlD =
+        (t.close_price - t.entry_price) * t.quantity;
+      const pnlP =
+        ((t.close_price - t.entry_price) / t.entry_price) * 100;
+      const rowCls = pnlD >= 0 ? 'closed-profit' : 'closed-loss';
+      return `
+        <tr class="${rowCls}">
+          <td class="sym">${esc(t.symbol)}</td>
+          <td class="muted">${esc(t.buy_date)}</td>
+          <td class="muted">${esc(t.close_date)}</td>
+          <td>${fmt(t.quantity, 4)}</td>
+          <td>$${fmt(t.entry_price)}</td>
+          <td>$${fmt(t.close_price)}</td>
+          <td>
+            <span class="${cc(pnlD)}">
+              ${sign(pnlD)}${fmtUSD(pnlD)}
+            </span>
+          </td>
+          <td>
+            <span class="${cc(pnlP)}">
+              ${sign(pnlP)}${fmt(pnlP)}%
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const total = closed.reduce(
+      (s, t) => s + (t.close_price - t.entry_price) * t.quantity, 0
+    );
+    summaryEl.innerHTML = `
+      <div class="summary-row">
+        Total Realized P&amp;L:
+        <span class="${cc(total)}">${fmtUSD(total)}</span>
+      </div>
+    `;
+  }
+
+  // ── Tooltip ────────────────────────────────────────────────────────────────
+  function showTT(event, row) {
+    const el = document.getElementById('tt-popup');
+    let breakdown;
+    try {
+      breakdown = JSON.parse(
+        decodeURIComponent(row.dataset.breakdown)
+      );
+    } catch { return; }
+
+    el.innerHTML =
+      '<div class="tt-title">Breakdown by position</div>' +
+      breakdown.map(b => `
+        <div class="tt-row">
+          <span class="tt-sym">${esc(b.symbol)}</span>
+          <span class="muted">$${fmt(b.day_close)}</span>
+          <span class="${cc(b.daily_pnl)}">
+            day&nbsp;${sign(b.daily_pnl)}${fmtUSD(b.daily_pnl)}
+          </span>
+          <span class="${cc(b.total_pnl)}">
+            entry&nbsp;${sign(b.total_pnl)}${fmtUSD(b.total_pnl)}
+          </span>
+        </div>
+      `).join('');
+
+    el.classList.add('show');
+    moveTT(event);
+  }
+
+  function moveTT(event) {
+    const el = document.getElementById('tt-popup');
+    const x  = event.clientX + 16;
+    const y  = event.clientY - 12;
+    const ow = el.offsetWidth;
+    const oh = el.offsetHeight;
+    el.style.left =
+      (x + ow > window.innerWidth  ? x - ow - 32 : x) + 'px';
+    el.style.top  =
+      (y + oh > window.innerHeight ? y - oh      : y) + 'px';
+  }
+
+  function hideTT() {
+    document.getElementById('tt-popup').classList.remove('show');
+  }
+
+  // ── Actions ────────────────────────────────────────────────────────────────
   function toggleCloseForm(id) {
     document.getElementById(`cfr-${id}`).classList.toggle('open');
   }
 
   async function handleClose(id) {
-    const priceVal = parseFloat(document.getElementById(`cf-price-${id}`).value);
-    const dateVal  = document.getElementById(`cf-date-${id}`).value;
-    if (!priceVal || priceVal <= 0) { toast('Enter a valid close price', 'error'); return; }
+    const priceVal =
+      parseFloat(document.getElementById(`cf-price-${id}`).value);
+    const dateVal  =
+      document.getElementById(`cf-date-${id}`).value;
+    if (!priceVal || priceVal <= 0) {
+      toast('Enter a valid close price', 'error'); return;
+    }
     if (!dateVal) { toast('Enter a close date', 'error'); return; }
     try {
       await apiCloseTrade(id, priceVal, dateVal);
@@ -762,25 +1119,31 @@
 
   async function handleAddTrade(e) {
     e.preventDefault();
-    const symbol     = document.getElementById('f-sym').value.trim().toUpperCase();
-    const buy_date   = document.getElementById('f-date').value;
-    const quantity   = parseFloat(document.getElementById('f-qty').value);
-    const entry_price = parseFloat(document.getElementById('f-price').value);
-    const notes      = document.getElementById('f-notes').value.trim() || null;
-
+    const symbol      =
+      document.getElementById('f-sym').value.trim().toUpperCase();
+    const buy_date    = document.getElementById('f-date').value;
+    const quantity    =
+      parseFloat(document.getElementById('f-qty').value);
+    const entry_price =
+      parseFloat(document.getElementById('f-price').value);
+    const notes =
+      document.getElementById('f-notes').value.trim() || null;
     try {
       await apiAddTrade({ symbol, buy_date, quantity, entry_price, notes });
       toast(`Added ${symbol}`);
       e.target.reset();
+      document.getElementById('f-date').value =
+        new Date().toISOString().slice(0, 10);
       await loadAll();
     } catch (err) {
       toast('Error: ' + err.message, 'error');
     }
   }
 
-  // ── Price loading ─────────────────────────────────────────────────────────
+  // ── Price loading ──────────────────────────────────────────────────────────
   async function loadPrices() {
-    const symbols = [...new Set(S.trades.open.map(t => t.symbol))];
+    const symbols =
+      [...new Set(S.trades.open.map(t => t.symbol))];
     if (!symbols.length) return;
 
     await Promise.all(
@@ -795,16 +1158,30 @@
     );
   }
 
-  // ── Full load ─────────────────────────────────────────────────────────────
+  // ── Daily history loading ──────────────────────────────────────────────────
+  async function loadDailyHistory() {
+    const loadEl = document.getElementById('history-loading');
+    const wrapEl = document.getElementById('history-wrap');
+    loadEl.innerHTML =
+      '<span class="spinner"></span>&nbsp; Fetching price history…';
+    loadEl.style.display = 'block';
+    wrapEl.style.display = 'none';
+    S.dailyHistory = await apiFetchDailyHistory();
+    renderDailyHistory();
+  }
+
+  // ── Full load ──────────────────────────────────────────────────────────────
   async function loadAll() {
     try {
       S.trades = await apiFetchTrades();
       S.prices = {};
       renderOpenTrades();
       renderEquityCurve();
+      renderClosedTrades();
       renderStats();
       setRefreshTime();
-      await loadPrices();
+      // Prices and daily history are independent — fetch in parallel
+      await Promise.all([loadPrices(), loadDailyHistory()]);
       setRefreshTime();
     } catch (err) {
       toast('Failed to load: ' + err.message, 'error');
@@ -812,17 +1189,19 @@
   }
 
   async function refreshAll() {
-    S.prices = {};
+    S.prices         = {};
+    S.dailyHistory   = [];
+    S.showAllHistory = false;
     await loadAll();
   }
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-  // Set today as default buy date
-  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
+  // ── Init ───────────────────────────────────────────────────────────────────
+  document.getElementById('f-date').value =
+    new Date().toISOString().slice(0, 10);
 
   loadAll();
 
-  // Auto-refresh prices every 60 seconds
+  // Auto-refresh live prices every 60 s (daily history is not re-fetched)
   setInterval(async () => {
     if (S.trades.open.length > 0) {
       await loadPrices();

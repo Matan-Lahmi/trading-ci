@@ -113,6 +113,121 @@ def get_price(symbol: str):
         }
 
 
+@app.get("/api/portfolio/daily-history")
+def get_portfolio_daily_history(db: Session = Depends(get_db)):
+    try:
+        open_trades = (
+            db.query(Trade).filter(Trade.status == "open").all()
+        )
+        if not open_trades:
+            return []
+
+        # Fetch price history per unique symbol from its buy_date
+        sym_hist: dict = {}
+        for trade in open_trades:
+            sym = trade.symbol
+            if sym in sym_hist:
+                continue
+            try:
+                ticker = yf.Ticker(sym)
+                h = ticker.history(start=trade.buy_date)
+                if h.empty:
+                    sym_hist[sym] = {}
+                else:
+                    sym_hist[sym] = {
+                        idx.strftime("%Y-%m-%d"): round(
+                            float(row["Close"]), 2
+                        )
+                        for idx, row in h.iterrows()
+                    }
+            except Exception:
+                sym_hist[sym] = {}
+
+        # Per-symbol sorted dates and prev-close lookup
+        sym_sorted: dict = {}
+        sym_prev: dict = {}
+        for sym, h in sym_hist.items():
+            dates = sorted(h.keys())
+            sym_sorted[sym] = dates
+            sym_prev[sym] = {
+                d: (h[dates[i - 1]] if i > 0 else None)
+                for i, d in enumerate(dates)
+            }
+
+        # First active market date per trade (for entry-price baseline)
+        trade_first: dict = {}
+        for trade in open_trades:
+            dates = sym_sorted.get(trade.symbol, [])
+            trade_first[trade.id] = next(
+                (d for d in dates if d >= trade.buy_date), None
+            )
+
+        # Trades grouped by symbol
+        by_sym: dict = {}
+        for t in open_trades:
+            by_sym.setdefault(t.symbol, []).append(t)
+
+        # Union of all dates across all symbols
+        all_dates = sorted({
+            d for h in sym_hist.values() for d in h
+        })
+        if not all_dates:
+            return []
+
+        result = []
+        for date in all_dates:
+            daily_pnl = 0.0
+            total_pnl = 0.0
+            breakdown = []
+
+            for sym, h in sym_hist.items():
+                day_close = h.get(date)
+                if day_close is None:
+                    continue
+                prev_close = sym_prev[sym].get(date)
+
+                for trade in by_sym.get(sym, []):
+                    if trade.buy_date > date:
+                        continue
+                    # On the trade's first market day use entry as base
+                    if date == trade_first.get(trade.id):
+                        base = trade.entry_price
+                    else:
+                        base = (
+                            prev_close
+                            if prev_close is not None
+                            else trade.entry_price
+                        )
+                    t_daily = (day_close - base) * trade.quantity
+                    t_total = (
+                        (day_close - trade.entry_price)
+                        * trade.quantity
+                    )
+                    daily_pnl += t_daily
+                    total_pnl += t_total
+                    breakdown.append({
+                        "symbol": sym,
+                        "qty": trade.quantity,
+                        "entry_price": trade.entry_price,
+                        "day_close": day_close,
+                        "daily_pnl": round(t_daily, 2),
+                        "total_pnl": round(t_total, 2),
+                    })
+
+            if breakdown:
+                result.append({
+                    "date": date,
+                    "daily_pnl": round(daily_pnl, 2),
+                    "total_pnl_from_entry": round(total_pnl, 2),
+                    "breakdown": breakdown,
+                })
+
+        return result
+
+    except Exception:
+        return []
+
+
 @app.get("/api/prices/{symbol}/history")
 def get_price_history(symbol: str, from_date: Optional[str] = None):
     try:
