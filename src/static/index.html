@@ -101,7 +101,7 @@
     /* ── Stats bar ──────────────────────────────────────────────── */
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 14px;
     }
     @media (max-width: 900px) {
@@ -418,6 +418,10 @@
       <div class="stat-value" id="s-invested">—</div>
     </div>
     <div class="stat-card">
+      <div class="stat-label">Portfolio Value</div>
+      <div class="stat-value" id="s-portfolio">—</div>
+    </div>
+    <div class="stat-card">
       <div class="stat-label">Unrealized P&amp;L</div>
       <div class="stat-value" id="s-unrealized">—</div>
     </div>
@@ -675,15 +679,25 @@
     document.getElementById('s-invested').textContent =
       '$' + fmt(invested);
 
-    // Unrealized P&L — show "…" until every symbol has been fetched
-    let unrealized = 0;
-    let allFetched = true;
+    // Portfolio Value & Unrealized P&L — show "…" until all prices in
+    let portfolioValue = 0;
+    let unrealized     = 0;
+    let allFetched     = true;
     for (const t of open) {
       const p = S.prices[t.symbol];
       if (p === undefined) { allFetched = false; continue; }
       if (p && p.current_price != null) {
-        unrealized += (p.current_price - t.entry_price) * t.quantity;
+        portfolioValue += p.current_price * t.quantity;
+        unrealized     += (p.current_price - t.entry_price) * t.quantity;
       }
+    }
+    const pEl = document.getElementById('s-portfolio');
+    if (open.length > 0 && !allFetched) {
+      pEl.textContent = '…';
+      pEl.className   = 'stat-value muted';
+    } else {
+      pEl.textContent = '$' + fmt(portfolioValue);
+      pEl.className   = 'stat-value';
     }
     const uEl = document.getElementById('s-unrealized');
     if (open.length > 0 && !allFetched) {
