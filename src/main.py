@@ -54,7 +54,9 @@ def get_trades(db: Session = Depends(get_db)):
 
 
 @app.put("/api/trades/{trade_id}/close", response_model=TradeResponse)
-def close_trade(trade_id: int, close_data: TradeClose, db: Session = Depends(get_db)):
+def close_trade(
+    trade_id: int, close_data: TradeClose, db: Session = Depends(get_db)
+):
     trade = db.query(Trade).filter(Trade.id == trade_id).first()
     if not trade:
         raise HTTPException(status_code=404, detail="Trade not found")
@@ -82,30 +84,51 @@ def get_price(symbol: str):
         ticker = yf.Ticker(symbol.upper())
         hist = ticker.history(period="2d")
         if hist.empty:
-            return {"symbol": symbol.upper(), "current_price": None, "daily_change_pct": None}
+            return {
+                "symbol": symbol.upper(),
+                "current_price": None,
+                "daily_change_pct": None,
+            }
         current_price = round(float(hist["Close"].iloc[-1]), 2)
         if len(hist) < 2:
-            return {"symbol": symbol.upper(), "current_price": current_price, "daily_change_pct": None}
+            return {
+                "symbol": symbol.upper(),
+                "current_price": current_price,
+                "daily_change_pct": None,
+            }
         prev_price = float(hist["Close"].iloc[-2])
-        daily_change_pct = round(((current_price - prev_price) / prev_price) * 100, 2)
+        daily_change_pct = round(
+            ((current_price - prev_price) / prev_price) * 100, 2
+        )
         return {
             "symbol": symbol.upper(),
             "current_price": current_price,
             "daily_change_pct": daily_change_pct,
         }
     except Exception:
-        return {"symbol": symbol.upper(), "current_price": None, "daily_change_pct": None}
+        return {
+            "symbol": symbol.upper(),
+            "current_price": None,
+            "daily_change_pct": None,
+        }
 
 
 @app.get("/api/prices/{symbol}/history")
 def get_price_history(symbol: str, from_date: Optional[str] = None):
     try:
         ticker = yf.Ticker(symbol.upper())
-        hist = ticker.history(start=from_date) if from_date else ticker.history(period="1y")
+        hist = (
+            ticker.history(start=from_date)
+            if from_date
+            else ticker.history(period="1y")
+        )
         if hist.empty:
             return []
         return [
-            {"date": idx.strftime("%Y-%m-%d"), "close": round(float(row["Close"]), 2)}
+            {
+                "date": idx.strftime("%Y-%m-%d"),
+                "close": round(float(row["Close"]), 2),
+            }
             for idx, row in hist.iterrows()
         ]
     except Exception:

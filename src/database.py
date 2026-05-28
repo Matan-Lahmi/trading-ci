@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
+from sqlalchemy import (
+    create_engine, Column, Integer, String, Float, DateTime, Text
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DB_PATH = os.getenv("DB_PATH", "/data/trading.db")

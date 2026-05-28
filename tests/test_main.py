@@ -1,7 +1,7 @@
 import os
 import pytest
 
-# Set before any src import so database.py picks up the test path at module load time
+# Set before any src import so database.py picks up the test path at load time
 os.environ["DB_PATH"] = "/tmp/test_trading_tracker.db"
 
 from fastapi.testclient import TestClient  # noqa: E402
@@ -11,11 +11,15 @@ from sqlalchemy.orm import sessionmaker  # noqa: E402
 from src.database import Base, get_db  # noqa: E402
 from src.main import app  # noqa: E402
 
-# ── Test database setup ────────────────────────────────────────────────────────
+# ── Test database setup ──────────────────────────────────────────────────────
 
 _TEST_DB_URL = "sqlite:////tmp/test_trading_tracker.db"
-_test_engine = create_engine(_TEST_DB_URL, connect_args={"check_same_thread": False})
-_TestSession = sessionmaker(autocommit=False, autoflush=False, bind=_test_engine)
+_test_engine = create_engine(
+    _TEST_DB_URL, connect_args={"check_same_thread": False}
+)
+_TestSession = sessionmaker(
+    autocommit=False, autoflush=False, bind=_test_engine
+)
 
 Base.metadata.create_all(bind=_test_engine)
 
@@ -30,7 +34,7 @@ def _override_get_db():
 
 app.dependency_overrides[get_db] = _override_get_db
 
-# ── Fixtures ───────────────────────────────────────────────────────────────────
+# ── Fixtures ─────────────────────────────────────────────────────────────────
 
 
 @pytest.fixture(scope="module")
@@ -47,7 +51,7 @@ def _cleanup():
         os.remove(path)
 
 
-# ── Tests ──────────────────────────────────────────────────────────────────────
+# ── Tests ────────────────────────────────────────────────────────────────────
 
 
 def test_create_trade(client):
